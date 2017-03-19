@@ -1,9 +1,9 @@
 -- DO NOT PUT ANY SENSITIVE CODE IN THIS FILE
 -- This file does not have access to the secure (forbidden) code.  It is only called via Outbound and no function in this file should ever return values.
 
-function StoreShowPreview(name, modelID)
+function StoreShowPreview(name, modelID, modelSceneID)
 	local frame = ModelPreviewFrame;
-	ModelPreviewFrame_ShowModel(modelID, false);
+	ModelPreviewFrame_ShowModel(modelID, modelSceneID, false);
 	frame.Display.Name:SetText(name);
 end
 
@@ -50,15 +50,18 @@ if (InGlue()) then
 
 	function StoreFrame_OnCharacterListUpdate()
 		if (C_StoreGlue.GetVASProductReady()) then
-			local _, guid, realmName = C_PurchaseAPI.GetVASCompletionInfo();
-			VASCharacterGUID = guid;
+			local productID, guid, realmName, shouldHandle = C_StoreSecure.GetVASCompletionInfo();
+			if (shouldHandle) then
+				VASCharacterGUID = guid;
 
-		    if (GetServerName() ~= realmName) then
-			    C_StoreGlue.ChangeRealmByCharacterGUID(guid);
-		    else
-			    UpdateCharacterList(true);
-		    end
-			C_StoreGlue.ClearVASProductReady();
+				C_StoreGlue.ClearVASProductReady();
+				if (GetServerName() ~= realmName or StoreFrame_IsVASTransferProduct(productID)) then
+					CharacterSelect_SetAutoSwitchRealm(true);
+			    	C_StoreGlue.ChangeRealmByCharacterGUID(guid);
+		    	else
+			    	UpdateCharacterList(true);
+		    	end
+			end
 			return;
 		end
 
