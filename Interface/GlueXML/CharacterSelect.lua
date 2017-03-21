@@ -129,7 +129,8 @@ function CharacterSelect_OnShow(self)
 
     UpdateAddonButton();
 
-    CharacterSelect_UpdateState();
+    local FROM_LOGIN_STATE_CHANGE = false;
+    CharacterSelect_UpdateState(FROM_LOGIN_STATE_CHANGE);
 
     -- Gameroom billing stuff (For Korea and China only)
     if ( SHOW_GAMEROOM_BILLING_FRAME ) then
@@ -275,9 +276,17 @@ function CharacterSelect_OnHide(self)
         StoreFrame:Hide();
     end
     CopyCharacterFrame:Hide();
-    if (AddonDialog:IsShown()) then
+    if ( AddonDialog:IsShown() ) then
         AddonDialog:Hide();
         HasShownAddonOutOfDateDialog = false;
+    end
+
+    if ( self.undeleting ) then
+        CharacterSelect_EndCharacterUndelete();
+    end
+
+    if ( CharSelectServicesFlowFrame:IsShown() ) then
+        CharSelectServicesFlowFrame:Hide();
     end
 
     AccountReactivate_CloseDialogs();
@@ -311,8 +320,12 @@ function CharacterSelect_UpdateState(fromLoginState)
         CharSelectRealmName:Hide();
     end
 
-    if (fromLoginState and REALM_CHANGE_IS_AUTO) then
+    if (fromLoginState == REALM_CHANGE_IS_AUTO) then
         if ( connected ) then
+            if (fromLoginState) then
+                CharacterSelectUI:Hide();
+                CharacterSelectUI:Show();
+            end
             GetCharacterListUpdate();
         else
             UpdateCharacterList();
@@ -595,7 +608,8 @@ function CharacterSelect_OnEvent(self, event, ...)
             UpdateCharacterList();
         end
     elseif ( event == "LOGIN_STATE_CHANGED" ) then
-        CharacterSelect_UpdateState(true);
+        local FROM_LOGIN_STATE_CHANGE = true;
+        CharacterSelect_UpdateState(FROM_LOGIN_STATE_CHANGE);
     end
 end
 
