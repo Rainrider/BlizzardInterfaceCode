@@ -55,6 +55,10 @@ function MapCanvasDataProviderMixin:OnCanvasPanChanged()
 	-- Optionally override in your mixin, called when the pan location changes
 end
 
+function MapCanvasDataProviderMixin:OnCanvasSizeChanged()
+	-- Optionally override in your mixin, called when the canvas size changes
+end
+
 function MapCanvasDataProviderMixin:OnEvent(event, ...)
 	-- Override in your mixin to accept events register via RegisterEvent
 end
@@ -65,6 +69,7 @@ end
 
 function MapCanvasDataProviderMixin:OnMapChanged()
 	--  Optionally override in your mixin, called when map ID changes
+	self:RefreshAllData();
 end
 
 function MapCanvasDataProviderMixin:RegisterEvent(event)
@@ -89,10 +94,6 @@ function MapCanvasDataProviderMixin:SignalEvent(event, ...)
 	if self.registeredEvents and self.registeredEvents[event] then
 		self:OnEvent(event, ...);
 	end
-end
-
-function MapCanvasDataProviderMixin:GetTransformFlags()
-	return self:GetMap():GetTransformFlags();
 end
 
 -- Provides a basic interface for something that is visible on the map canvas, like icons, blobs or text
@@ -120,6 +121,14 @@ end
 
 function MapCanvasPinMixin:OnMouseLeave()
 	-- Override in your mixin, called when the mouse leaves this pin
+end
+
+function MapCanvasPinMixin:OnMouseDown()
+	-- Override in your mixin, called when the mouse is pressed on this pin
+end
+
+function MapCanvasPinMixin:OnMouseUp()
+	-- Override in your mixin, called when the mouse is released
 end
 
 function MapCanvasPinMixin:OnMapInsetSizeChanged(mapInsetIndex, expanded)
@@ -269,6 +278,10 @@ function MapCanvasPinMixin:OnCanvasPanChanged()
 	-- Optionally override in your mixin, called when the pan location changes
 end
 
+function MapCanvasPinMixin:OnCanvasSizeChanged()
+	-- Optionally override in your mixin, called when the canvas size changes
+end
+
 function MapCanvasPinMixin:SetScalingLimits(scaleFactor, startScale, endScale)
 	self.scaleFactor = scaleFactor;
 	self.startScale = startScale and math.max(startScale, .01) or nil;
@@ -328,4 +341,18 @@ function MapCanvasPinMixin:ApplyCurrentAlpha()
 		self:SetAlpha(alpha);
 		self:SetShown(alpha > 0.05);
 	end
+end
+
+function MapCanvasPinMixin:UseFrameLevelType(pinFrameLevelType, index)
+	self.pinFrameLevelType = pinFrameLevelType;
+	self.pinFrameLevelIndex = index;
+end
+
+function MapCanvasPinMixin:GetFrameLevelType(pinFrameLevelType)
+	return self.pinFrameLevelType or "PIN_FRAME_LEVEL_DEFAULT";
+end
+
+function MapCanvasPinMixin:ApplyFrameLevel()
+	local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
+	self:SetFrameLevel(frameLevel);
 end

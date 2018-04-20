@@ -10,6 +10,7 @@ MICRO_BUTTONS = {
 	"EJMicroButton",
 	"CollectionsMicroButton",
 	"MainMenuMicroButton",
+	"HelpMicroButton",
 	"StoreMicroButton",
 	}
 
@@ -23,11 +24,11 @@ function LoadMicroButtonTextures(self, name)
 	self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	self:RegisterEvent("UPDATE_BINDINGS");
 	self:RegisterEvent("NEUTRAL_FACTION_SELECT_RESULT");
-	local prefix = "Interface\\Buttons\\UI-MicroButton-";
-	self:SetNormalTexture(prefix..name.."-Up");
-	self:SetPushedTexture(prefix..name.."-Down");
-	self:SetDisabledTexture(prefix..name.."-Disabled");
-	self:SetHighlightTexture("Interface\\Buttons\\UI-MicroButton-Hilight");
+	local prefix = "hud-microbutton-";
+	self:SetNormalAtlas(prefix..name.."-Up", true);
+	self:SetPushedAtlas(prefix..name.."-Down", true);
+	self:SetDisabledAtlas(prefix..name.."-Disabled", true);
+	self:SetHighlightAtlas("hud-microbutton-highlight", true);
 end
 
 function MicroButtonTooltipText(text, action)
@@ -68,10 +69,11 @@ function MoveMicroButtons(anchor, anchorTo, relAnchor, x, y, isStacked)
 	CharacterMicroButton:SetPoint(anchor, anchorTo, relAnchor, x, y);
 	LFDMicroButton:ClearAllPoints();
 	if ( isStacked ) then
-		LFDMicroButton:SetPoint("TOPLEFT", CharacterMicroButton, "BOTTOMLEFT", 0, 24);
+		LFDMicroButton:SetPoint("TOPLEFT", CharacterMicroButton, "BOTTOMLEFT", 0, -1);
 	else
-		LFDMicroButton:SetPoint("BOTTOMLEFT", GuildMicroButton, "BOTTOMRIGHT", -3, 0);
+		LFDMicroButton:SetPoint("BOTTOMLEFT", GuildMicroButton, "BOTTOMRIGHT", -2, 0);
 	end
+	MainMenuMicroButton_RepositionAlerts();
 	UpdateMicroButtons();
 end
 
@@ -206,6 +208,8 @@ function UpdateMicroButtons()
 		StoreMicroButton:SetButtonState("NORMAL");
 	end
 	
+	StoreMicroButton:Show();
+	HelpMicroButton:Hide();
 	if ( IsVeteranTrialAccount() ) then
 		StoreMicroButton.disabledTooltip = ERR_RESTRICTED_ACCOUNT_TRIAL;
 		StoreMicroButton:Disable();
@@ -219,8 +223,13 @@ function UpdateMicroButtons()
 		StoreMicroButton.disabledTooltip = ERR_SYSTEM_DISABLED;
 		StoreMicroButton:Disable();
 	elseif ( not C_StorePublic.IsEnabled() ) then
-		StoreMicroButton.disabledTooltip = BLIZZARD_STORE_ERROR_UNAVAILABLE;
-		StoreMicroButton:Disable();
+		if ( GetCurrentRegionName() == "CN" ) then
+			HelpMicroButton:Show();
+			StoreMicroButton:Hide();
+		else
+			StoreMicroButton.disabledTooltip = BLIZZARD_STORE_ERROR_UNAVAILABLE;
+			StoreMicroButton:Disable();
+		end
 	else
 		StoreMicroButton.disabledTooltip = nil;
 		StoreMicroButton:Enable();
@@ -286,8 +295,8 @@ function GuildMicroButton_UpdateTabard(forceUpdate)
 	if ( emblemFilename ) then
 		if ( not tabard:IsShown() ) then
 			local button = GuildMicroButton;
-			button:SetNormalTexture("Interface\\Buttons\\UI-MicroButtonCharacter-Up");
-			button:SetPushedTexture("Interface\\Buttons\\UI-MicroButtonCharacter-Down");
+			button:SetNormalAtlas("hud-microbutton-Character-Up", true);
+			button:SetPushedAtlas("hud-microbutton-Character-Down", true);
 			-- no need to change disabled texture, should always be available if you're in a guild
 			tabard:Show();
 		end
@@ -295,9 +304,9 @@ function GuildMicroButton_UpdateTabard(forceUpdate)
 	else
 		if ( tabard:IsShown() ) then
 			local button = GuildMicroButton;
-			button:SetNormalTexture("Interface\\Buttons\\UI-MicroButton-Socials-Up");
-			button:SetPushedTexture("Interface\\Buttons\\UI-MicroButton-Socials-Down");
-			button:SetDisabledTexture("Interface\\Buttons\\UI-MicroButton-Socials-Disabled");
+			button:SetNormalAtlas("hud-microbutton-Socials-Up", true);
+			button:SetPushedAtlas("hud-microbutton-Socials-Down", true);
+			button:SetDisabledAtlas("hud-microbutton-Socials-Disabled", true);
 			tabard:Hide();
 		end
 	end
@@ -305,27 +314,39 @@ function GuildMicroButton_UpdateTabard(forceUpdate)
 end
 
 function CharacterMicroButton_OnLoad(self)
-	self:SetNormalTexture("Interface\\Buttons\\UI-MicroButtonCharacter-Up");
-	self:SetPushedTexture("Interface\\Buttons\\UI-MicroButtonCharacter-Down");
-	self:SetHighlightTexture("Interface\\Buttons\\UI-MicroButton-Hilight");
 	self:RegisterEvent("UNIT_PORTRAIT_UPDATE");
-	self:RegisterEvent("UPDATE_BINDINGS");
+	self:RegisterEvent("PORTRAITS_UPDATED");
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
+	self:RegisterEvent("AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED");
+	self:RegisterEvent("AZERITE_ITEM_POWER_LEVEL_CHANGED");
 	self.tooltipText = MicroButtonTooltipText(CHARACTER_BUTTON, "TOGGLECHARACTER0");
 	self.newbieText = NEWBIE_TOOLTIP_CHARACTER;
+	LoadMicroButtonTextures(self, "Character");	
 end
 
 function CharacterMicroButton_OnEvent(self, event, ...)
 	if ( event == "UNIT_PORTRAIT_UPDATE" ) then
 		local unit = ...;
-		if ( not unit or unit == "player" ) then
+		if ( unit == "player" ) then
 			SetPortraitTexture(MicroButtonPortrait, "player");
 		end
-		return;
+	elseif ( event == "PORTRAITS_UPDATED" ) then
+		SetPortraitTexture(MicroButtonPortrait, "player");
 	elseif ( event == "PLAYER_ENTERING_WORLD" ) then
 		SetPortraitTexture(MicroButtonPortrait, "player");
-	elseif ( event == "UPDATE_BINDINGS" ) then
-		self.tooltipText = MicroButtonTooltipText(CHARACTER_BUTTON, "TOGGLECHARACTER0");
+		CharacterMicroButton_UpdatePulsing(self);
+	elseif ( event == "AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED" ) then
+		CharacterMicroButton_UpdatePulsing(self);
+	elseif ( event == "AZERITE_ITEM_POWER_LEVEL_CHANGED" ) then
+		CharacterMicroButton_UpdatePulsing(self);
+	end
+end
+
+function CharacterMicroButton_UpdatePulsing(self)
+	if IsPlayerInWorld() and AzeriteUtil.DoEquippedItemsHaveUnselectedPowers() then
+		MicroButtonPulse(self);
+	else
+		MicroButtonPulseStop(self);
 	end
 end
 
@@ -337,6 +358,7 @@ end
 function CharacterMicroButton_SetNormal()
 	MicroButtonPortrait:SetTexCoord(0.2, 0.8, 0.0666, 0.9);
 	MicroButtonPortrait:SetAlpha(1.0);
+	CharacterMicroButton_UpdatePulsing(CharacterMicroButton);
 end
 
 function MainMenuMicroButton_SetPushed()
@@ -399,6 +421,7 @@ function MainMenuMicroButton_ShowAlert(alert, text, tutorialIndex)
 	alert.Text:SetText(text);
 	alert:SetHeight(alert.Text:GetHeight()+42);
 	alert.tutorialIndex = tutorialIndex;
+	MainMenuMicroButton_PositionAlert(alert);
 	alert:Show();
 
 	g_visibleMicroButtonAlerts[alert] = true;
@@ -406,22 +429,59 @@ function MainMenuMicroButton_ShowAlert(alert, text, tutorialIndex)
 	return alert:IsShown();
 end
 
+function MainMenuMicroButton_RepositionAlerts()
+	for alert in pairs(g_visibleMicroButtonAlerts) do
+		MainMenuMicroButton_PositionAlert(alert);
+	end
+end
+
+function MainMenuMicroButton_PositionAlert(alert)
+	if ( alert.MicroButton:GetRight() + (alert:GetWidth() / 2) > UIParent:GetRight() ) then
+		alert:ClearAllPoints();
+		alert:SetPoint("BOTTOMRIGHT", alert.MicroButton, "TOPRIGHT", 16, 20);
+		alert.Arrow:ClearAllPoints();
+		alert.Arrow:SetPoint("TOPRIGHT", alert, "BOTTOMRIGHT", -4, 4);
+	else
+		alert:ClearAllPoints();
+		alert:SetPoint("BOTTOM", alert.MicroButton, "TOP", 0, 20);
+		alert.Arrow:ClearAllPoints();
+		alert.Arrow:SetPoint("TOP", alert, "BOTTOM", 0, 4);
+	end
+end
+
 TalentMicroButtonMixin = {};
+
+function TalentMicroButtonMixin:HasTalentAlertToShow()
+	return not AreTalentsLocked() and GetNumUnspentTalents() > 0;
+end
+
+function TalentMicroButtonMixin:HasPvpTalentAlertToShow()
+	local hasEmptySlot, hasNewTalent = C_SpecializationInfo.GetPvpTalentAlertStatus();
+	if (hasEmptySlot) then
+		return true, TALENT_MICRO_BUTTON_UNSPENT_PVP_TALENT_SLOT;
+	elseif (hasNewTalent) then
+		return true, TALENT_MICRO_BUTTON_NEW_PVP_TALENT;
+	end
+
+	return false;
+end
 
 function TalentMicroButtonMixin:EvaluateAlertVisibility()
 	-- If we just unspecced, and we have unspent talent points, it's probably spec-specific talents that were just wiped.  Show the tutorial box.
-	if not AreTalentsLocked() and GetNumUnspentTalents() > 0 and (not PlayerTalentFrame or not PlayerTalentFrame:IsShown()) then
+	if self:HasTalentAlertToShow() and (not PlayerTalentFrame or not PlayerTalentFrame:IsShown()) then
 		if MainMenuMicroButton_ShowAlert(TalentMicroButtonAlert, TALENT_MICRO_BUTTON_UNSPENT_TALENTS) then
             TalentMicroButton.suggestedTab = 2;
 			return;
 		end
 	end
-    if GetNumUnspentPvpTalents() > 0 and (not PlayerTalentFrame or not PlayerTalentFrame:IsShown()) then
-        if (MainMenuMicroButton_ShowAlert(TalentMicroButtonAlert, TALENT_MICRO_BUTTON_UNSPENT_HONOR_TALENTS)) then
-            TalentMicroButton.suggestedTab = 3;
+	local hasAlert, text = self:HasPvpTalentAlertToShow();
+	if hasAlert and (not PlayerTalentFrame or not PlayerTalentFrame:IsShown()) then
+        if (MainMenuMicroButton_ShowAlert(TalentMicroButtonAlert, text)) then
+            TalentMicroButton.suggestedTab = 2;
             return;
         end
-    end
+	end
+
     TalentMicroButton.suggestedTab = nil;
 end
 
@@ -449,24 +509,13 @@ function TalentMicroButton_OnEvent(self, event, ...)
 		-- Small hack: GetNumSpecializations should return 0 if talents haven't been initialized yet
 		if (not self.receivedUpdate and GetNumSpecializations(false) > 0) then
 			self.receivedUpdate = true;
-			local shouldPulseForTalents = GetNumUnspentTalents() > 0 or GetNumUnspentPvpTalents() > 0 and not AreTalentsLocked();
+			local shouldPulseForTalents = self:HasTalentAlertToShow() or self:HasPvpTalentAlertToShow();
 			if (UnitLevel("player") >= SHOW_SPEC_LEVEL and (not GetSpecialization() or shouldPulseForTalents)) then
 				MicroButtonPulse(self);		
 			end
 		end
 	elseif ( event == "UPDATE_BINDINGS" ) then
 		self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, "TOGGLETALENTS");
-	elseif ( event == "PLAYER_CHARACTER_UPGRADE_TALENT_COUNT_CHANGED" ) then
-		local prev, current = ...;
-		if ( prev == 0 and current > 0 ) then
-			if MainMenuMicroButton_ShowAlert(TalentMicroButtonAlert, TALENT_MICRO_BUTTON_TALENT_TUTORIAL) then
-				MicroButtonPulse(self);
-			end
-		elseif ( prev ~= current ) then
-			if MainMenuMicroButton_ShowAlert(TalentMicroButtonAlert, TALENT_MICRO_BUTTON_UNSPENT_TALENTS) then
-				MicroButtonPulse(self);
-			end
-		end
 	end
 end
 
@@ -540,9 +589,6 @@ function EJMicroButton_OnLoad(self)
 	SetDesaturation(self:GetDisabledTexture(), true);
 	self.tooltipText = MicroButtonTooltipText(ENCOUNTER_JOURNAL, "TOGGLEENCOUNTERJOURNAL");
 	self.newbieText = NEWBIE_TOOLTIP_ENCOUNTER_JOURNAL;
-	if (IsKioskModeEnabled()) then
-		self:Disable();
-	end
 
 	--events that can trigger a refresh of the adventure journal
 	self:RegisterEvent("VARIABLES_LOADED");
@@ -555,7 +601,7 @@ EJMicroButtonMixin = {};
 function EJMicroButtonMixin:EvaluateAlertVisibility()
 	if self.playerEntered and self.varsLoaded and self.zoneEntered then
 		if self:IsEnabled() then
-			local showAlert = not GetCVarBool("hideAdventureJournalAlerts");
+			local showAlert = not IsKioskModeEnabled() and not GetCVarBool("hideAdventureJournalAlerts");
 			if( showAlert ) then
 				-- display alert if the player hasn't opened the journal for a long time
 				local lastTimeOpened = tonumber(GetCVar("advJournalLastOpened"));
@@ -591,10 +637,6 @@ function EJMicroButtonMixin:UpdateLastEvaluations()
 end
 
 function EJMicroButton_OnEvent(self, event, ...)
-	if (IsKioskModeEnabled()) then
-		return;
-	end
-
 	if( event == "UPDATE_BINDINGS" ) then
 		self.tooltipText = MicroButtonTooltipText(ADVENTURE_JOURNAL, "TOGGLEENCOUNTERJOURNAL");
 		self.newbieText = NEWBIE_TOOLTIP_ENCOUNTER_JOURNAL;
@@ -657,13 +699,9 @@ function EJMicroButton_UpdateDisplay()
 		frame:SetButtonState("PUSHED", true);
 	else
 		local disabled = not C_AdventureJournal.CanBeShown();
-		if ( IsKioskModeEnabled() or disabled ) then
+		if ( disabled ) then
 			frame:Disable();
-			if (IsKioskModeEnabled()) then
-				SetKioskTooltip(frame);
-			elseif ( disabled ) then
-				frame.disabledTooltip = FEATURE_NOT_YET_AVAILABLE;
-			end
+			frame.disabledTooltip = FEATURE_NOT_YET_AVAILABLE;
 			EJMicroButton_ClearNewAdventureNotice();
 		else
 			frame:Enable();

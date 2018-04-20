@@ -10,13 +10,18 @@ UNITPOPUP_TIMEOUT = 5;
 UNITPOPUP_SPACER_SPACING = 6;
 
 local function makeUnitPopupSubsectionTitle(titleText)
-	return { text = titleText, dist = 0, isTitle = true, isUninteractable = true, isSubsectionTitle = true, };
+	return { text = titleText, dist = 0, isTitle = true, isUninteractable = true, isSubsection = true, isSubsectionTitle = true, isSubsectionSeparator = true, };
+end
+
+local function makeUnitPopupSubsectionSeparator()
+	return { text = "", dist = 0, isTitle = true, isUninteractable = true, isSubsection = true, isSubsectionTitle = false, isSubsectionSeparator = true, };
 end
 
 UnitPopupButtons = {
-	["CANCEL"] = { text = CANCEL, dist = 0, space = 1 },
+	["CANCEL"] = { text = CANCEL, dist = 0, space = 1, isCloseCommand = true, },
+	["CLOSE"] = { text = CLOSE, dist = 0, space = 1, isCloseCommand = true, },
 	["TRADE"] = { text = TRADE, dist = 2 },
-	["INSPECT"] = { text = INSPECT, dist = 0, disabledInKioskMode = true },
+	["INSPECT"] = { text = INSPECT, dist = 0, disabledInKioskMode = false },
 	["ACHIEVEMENTS"] = { text = COMPARE_ACHIEVEMENTS, dist = 1, disabledInKioskMode = true },
 	["TARGET"] = { text = TARGET, dist = 0 },
 	["IGNORE"]	= {
@@ -26,7 +31,7 @@ UnitPopupButtons = {
 		end,
 	},
 	["POP_OUT_CHAT"] = { text = MOVE_TO_WHISPER_WINDOW, dist = 0 },
-	["DUEL"] = { text = DUEL, dist = 3, space = 1, disabledInKioskMode = true },
+	["DUEL"] = { text = DUEL, dist = 3, space = 1, disabledInKioskMode = false },
 	["PET_BATTLE_PVP_DUEL"] = { text = PET_BATTLE_PVP_DUEL, dist = 5, space = 1, disabledInKioskMode = true },
 	["WHISPER"]	= { text = WHISPER, dist = 0 },
 	["INVITE"]	= { text = PARTY_INVITE, dist = 0 },
@@ -70,10 +75,12 @@ UnitPopupButtons = {
 	["OTHER_SUBSECTION_TITLE"] = makeUnitPopupSubsectionTitle(UNIT_FRAME_DROPDOWN_SUBSECTION_TITLE_OTHER),
 	["INTERACT_SUBSECTION_TITLE"] = makeUnitPopupSubsectionTitle(UNIT_FRAME_DROPDOWN_SUBSECTION_TITLE_INTERACT),
 	["LEGACY_RAID_SUBSECTION_TITLE"] = makeUnitPopupSubsectionTitle(UNIT_FRAME_DROPDOWN_SUBSECTION_TITLE_LEGACY_RAID),
+	["SUBSECTION_SEPARATOR"] = makeUnitPopupSubsectionSeparator(),
 
 	["REPORT_PLAYER"] = { text = REPORT_PLAYER_FOR, dist = 0, nested = 1 },
 	["REPORT_SPAM"]	= { text = REPORT_SPAMMING, dist = 0 },
 	["REPORT_BAD_LANGUAGE"] = { text = REPORT_BAD_LANGUAGE, dist = 0},
+	["REPORT_BAD_LANGUAGE_VOICE"] = { text = REPORT_BAD_LANGUAGE_VOICE, dist = 0},
 	["REPORT_BAD_NAME"] = { text = REPORT_BAD_NAME, dist = 0 },
 	["REPORT_BAD_GUILD_NAME"] = { text = REPORT_BAD_GUILD_NAME, dist = 0 },
 	["REPORT_CHEATING"] = { text = REPORT_CHEATING, dist = 0 },
@@ -186,6 +193,14 @@ UnitPopupButtons = {
 
 	-- Garrison
 	["GARRISON_VISIT"] = { text = GARRISON_VISIT_LEADER, dist = 0 },
+
+	-- Voice Chat
+	["VOICE_CHAT_MICROPHONE_VOLUME"] = { customFrame = UnitPopupVoiceMicrophoneVolume, dist = 0, },
+	["VOICE_CHAT_SPEAKER_VOLUME"] = { customFrame = UnitPopupVoiceSpeakerVolume, dist = 0, },
+	["VOICE_CHAT_USER_VOLUME"] = { customFrame = UnitPopupVoiceUserVolume, dist = 0, },
+	["VOICE_CHAT_COMMUNICATIONS_MODE_OPEN_MIC"] = { text = OPEN_MIC, dist = 0, checkable = 1, },
+	["VOICE_CHAT_COMMUNICATIONS_MODE_PUSH_TO_TALK"] = { text = PUSH_TO_TALK, dist = 0, checkable = 1, },
+	["VOICE_CHAT_SETTINGS"] = { text = VOICE_CHAT_SETTINGS, dist = 0, },
 };
 
 -- First level menus
@@ -207,7 +222,7 @@ UnitPopupMenus = {
 	["GUILD_OFFLINE"] = { "GUILD_BATTLETAG_FRIEND", "INTERACT_SUBSECTION_TITLE", "GUILD_PROMOTE", "OTHER_SUBSECTION_TITLE", "IGNORE", "GUILD_LEAVE", "CANCEL" },
 	["RAID_TARGET_ICON"] = { "RAID_TARGET_8", "RAID_TARGET_7", "RAID_TARGET_6", "RAID_TARGET_5", "RAID_TARGET_4", "RAID_TARGET_3", "RAID_TARGET_2", "RAID_TARGET_1", "RAID_TARGET_NONE" },
 	["SELECT_ROLE"] = { "SET_ROLE_TANK", "SET_ROLE_HEALER", "SET_ROLE_DAMAGER", "SET_ROLE_NONE" },
-	["CHAT_ROSTER"] = { "TARGET", "INTERACT_SUBSECTION_TITLE", "WHISPER", "CHAT_OWNER", "CHAT_PROMOTE", "OTHER_SUBSECTION_TITLE", "CHAT_DEMOTE", "CANCEL"  },
+	["CHAT_ROSTER"] = { "VOICE_CHAT_MICROPHONE_VOLUME", "VOICE_CHAT_SPEAKER_VOLUME", "VOICE_CHAT_USER_VOLUME", "SUBSECTION_SEPARATOR", "VOICE_CHAT_COMMUNICATIONS_MODE_OPEN_MIC", "VOICE_CHAT_COMMUNICATIONS_MODE_PUSH_TO_TALK", "SUBSECTION_SEPARATOR", "INTERACT_SUBSECTION_TITLE", "TARGET", "WHISPER", "CHAT_OWNER", "CHAT_PROMOTE", "CHAT_DEMOTE", "SUBSECTION_SEPARATOR", "OTHER_SUBSECTION_TITLE", "REPORT_PLAYER", "VOICE_CHAT_SETTINGS", "CLOSE" },
 	["VEHICLE"] = { "RAID_TARGET_ICON", "SET_FOCUS", "OTHER_SUBSECTION_TITLE", "VEHICLE_LEAVE", "MOVE_PLAYER_FRAME", "MOVE_TARGET_FRAME", "CANCEL" },
 	["TARGET"] = { "RAID_TARGET_ICON", "SET_FOCUS", "ADD_FRIEND", "ADD_FRIEND_MENU", "OTHER_SUBSECTION_TITLE", "MOVE_PLAYER_FRAME", "MOVE_TARGET_FRAME", "CANCEL" },
 	["ARENAENEMY"] = { "SET_FOCUS", "OTHER_SUBSECTION_TITLE", "CANCEL" },
@@ -222,7 +237,7 @@ UnitPopupMenus = {
 	["LOOT_THRESHOLD"] = { "ITEM_QUALITY2_DESC", "ITEM_QUALITY3_DESC", "ITEM_QUALITY4_DESC", "CANCEL" },
 	["SELECT_LOOT_SPECIALIZATION"] = { "LOOT_SPECIALIZATION_DEFAULT","LOOT_SPECIALIZATION_SPEC1", "LOOT_SPECIALIZATION_SPEC2", "LOOT_SPECIALIZATION_SPEC3", "LOOT_SPECIALIZATION_SPEC4"},
 	["OPT_OUT_LOOT_TITLE"] = { "OPT_OUT_LOOT_ENABLE", "OPT_OUT_LOOT_DISABLE"},
-	["REPORT_PLAYER"] = { "REPORT_SPAM", "REPORT_BAD_LANGUAGE", "REPORT_BAD_NAME", "REPORT_BAD_GUILD_NAME", "REPORT_CHEATING" },
+	["REPORT_PLAYER"] = { "REPORT_SPAM", "REPORT_BAD_LANGUAGE", "REPORT_BAD_LANGUAGE_VOICE", "REPORT_BAD_NAME", "REPORT_BAD_GUILD_NAME", "REPORT_CHEATING" },
 	["DUNGEON_DIFFICULTY"] = { "DUNGEON_DIFFICULTY1", "DUNGEON_DIFFICULTY2", "DUNGEON_DIFFICULTY3" },
 	["RAID_DIFFICULTY"] = { "RAID_DIFFICULTY1", "RAID_DIFFICULTY2", "RAID_DIFFICULTY3", "LEGACY_RAID_SUBSECTION_TITLE", "LEGACY_RAID_DIFFICULTY1", "LEGACY_RAID_DIFFICULTY2" },
 	["BN_REPORT"] = { "BN_REPORT_NAME" },
@@ -240,21 +255,31 @@ UnitLootMethod = {
 	["master"] = { text = LOOT_MASTER_LOOTER, tooltipText = NEWBIE_TOOLTIP_UNIT_MASTER_LOOTER },
 };
 
-UnitPopupFrames = {
-	"PlayerFrameDropDown",
-	"TargetFrameDropDown",
-	"FocusFrameDropDown",
-	"PartyMemberFrame1DropDown",
-	"PartyMemberFrame2DropDown",
-	"PartyMemberFrame3DropDown",
-	"PartyMemberFrame4DropDown",
-	"FriendsDropDown",
-	"PetBattleUnitFrameDropDown",
-	"GuildMemberDropDown",
-	"WorldStateButtonDropDown",
-};
+local function UnitPopup_CheckAddSubsection(dropdownMenu, info, menuLevel, currentButton, previousButton, previousIndex, previousValue)
+	if previousButton and previousButton.isSubsection then
+		if not currentButton.isSubsection then
+			if previousButton.isSubsectionSeparator then
+				UIDropDownMenu_AddSeparator(menuLevel);
+			end
+
+			if previousButton.isSubsectionTitle and info then
+				UnitPopup_AddDropDownButton(info, dropdownMenu, previousButton, previousValue, menuLevel);
+			end
+		else
+			UnitPopupShown[menuLevel][previousIndex] = 0;
+		end
+	end
+end
+
+local g_mostRecentPopupMenu;
+
+function UnitPopup_HasVisibleMenu()
+	return g_mostRecentPopupMenu and g_mostRecentPopupMenu:IsVisible();
+end
 
 function UnitPopup_ShowMenu (dropdownMenu, which, unit, name, userData)
+	g_mostRecentPopupMenu = nil;
+
 	local server = nil;
 	-- Init variables
 	dropdownMenu.which = which;
@@ -278,13 +303,17 @@ function UnitPopup_ShowMenu (dropdownMenu, which, unit, name, userData)
 	-- If only one menu item (the cancel button) then don't show the menu
 	local count = 0;
 	for index, value in ipairs(UnitPopupMenus[UIDROPDOWNMENU_MENU_VALUE] or UnitPopupMenus[which]) do
-		if( UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] == 1 and value ~= "CANCEL" ) then
+		if( UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] == 1 and not UnitPopupButtons[value].isCloseCommand ) then
 			count = count + 1;
 		end
 	end
 	if ( count < 1 ) then
 		return;
 	end
+
+	-- Note the fact that a popup is being shown. If this menu is hidden through other means, it's fine, the unitpopup system
+	-- checks to see if this is visible.
+	g_mostRecentPopupMenu = dropdownMenu;
 
 	-- Determine which loot method and which loot threshold are selected and set the corresponding buttons to the same text
 	dropdownMenu.selectedLootMethod = UnitLootMethod[GetLootMethod()].text;
@@ -379,24 +408,14 @@ function UnitPopup_ShowMenu (dropdownMenu, which, unit, name, userData)
 		dropdownMenu.which = UIDROPDOWNMENU_MENU_VALUE;
 		-- Set which menu is being opened
 		OPEN_DROPDOWNMENUS[UIDROPDOWNMENU_MENU_LEVEL] = {which = dropdownMenu.which, unit = dropdownMenu.unit};
-		local subsectionTitleValue = nil;
-		local subsectionTitleIndex = nil;
-		local previousWasSubsectionTitle = false;
+		local previousButton, previousIndex, previousValue;
 		for index, value in ipairs(UnitPopupMenus[UIDROPDOWNMENU_MENU_VALUE]) do
 			if( UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] == 1 ) then
 				local cntButton = UnitPopupButtons[value];
 
-				if ( previousWasSubsectionTitle ) then
-					if ( not cntButton.isSubsectionTitle ) then
-						UIDropDownMenu_AddSeparator(info, UIDROPDOWNMENU_MENU_LEVEL);
-						UnitPopup_AddDropDownButton(info, dropdownMenu, UnitPopupButtons[subsectionTitleValue], subsectionTitleValue, UIDROPDOWNMENU_MENU_LEVEL);
-					else
-						UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][subsectionTitleIndex] = 0;
-					end
-					subsectionTitleIndex = nil;
-					subsectionTitleValue = nil;
-				end
+				UnitPopup_CheckAddSubsection(dropdownMenu, info, UIDROPDOWNMENU_MENU_LEVEL, cntButton, previousButton, previousIndex, previousValue);
 
+				-- Note, for the subsections, this info is 'created' later so that when the subsection is added retroactively, it doesn't overwrite or lose fields
 				info = UIDropDownMenu_CreateInfo();
 				info.text = UnitPopupButtons[value].text;
 				info.owner = UIDROPDOWNMENU_MENU_VALUE;
@@ -536,68 +555,73 @@ function UnitPopup_ShowMenu (dropdownMenu, which, unit, name, userData)
 				info.tooltipTitle = UnitPopupButtons[value].text;
 				info.tooltipText = _G["NEWBIE_TOOLTIP_UNIT_"..value];
 
-				previousWasSubsectionTitle = false;
-
-				if ( cntButton.isSubsectionTitle ) then
-					subsectionTitleValue = value;
-					subsectionTitleIndex = index;
-					previousWasSubsectionTitle = true;
-				else
+				if not cntButton.isSubsection then
 					UnitPopup_AddDropDownButton(info, dropdownMenu, cntButton, value, UIDROPDOWNMENU_MENU_LEVEL);
 				end
+
+				previousButton = cntButton;
+				previousIndex = index;
+				previousValue = value;
 			end
 		end
 		return;
 	end
 
-	-- Add dropdown title
-	if ( unit or name ) then
-		info = UIDropDownMenu_CreateInfo();
-		if ( name ) then
-			info.text = name;
-		else
-			info.text = UNKNOWN;
-		end
-		info.isTitle = true;
-		info.notCheckable = true;
-		UIDropDownMenu_AddButton(info);
-	end
+	UnitPopup_AddDropDownTitle(unit, name, userData);
 
 	-- Set which menu is being opened
 	OPEN_DROPDOWNMENUS[UIDROPDOWNMENU_MENU_LEVEL] = {which = dropdownMenu.which, unit = dropdownMenu.unit};
 	-- Show the buttons which are used by this menu
-	local tooltipText;
 	info = UIDropDownMenu_CreateInfo();
-	local subsectionTitleValue = nil;
-	local subsectionTitleIndex = nil;
-	local previousWasSubsectionTitle = false;
+	local tooltipText;
+	local previousButton, previousIndex, previousValue;
 	for index, value in ipairs(UnitPopupMenus[which]) do
 		if( UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] == 1 ) then
 			local cntButton = UnitPopupButtons[value];
 
-			if ( previousWasSubsectionTitle ) then
-				if ( not cntButton.isSubsectionTitle ) then
-					UIDropDownMenu_AddSeparator(info, UIDROPDOWNMENU_MENU_LEVEL);
-					UnitPopup_AddDropDownButton(info, dropdownMenu, UnitPopupButtons[subsectionTitleValue], subsectionTitleValue);
-				else
-					UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][subsectionTitleIndex] = 0;
-				end
-				subsectionTitleIndex = nil;
-				subsectionTitleValue = nil;
-			end
+			UnitPopup_CheckAddSubsection(dropdownMenu, info, UIDROPDOWNMENU_MENU_LEVEL, cntButton, previousButton, previousIndex, previousValue);
 
-			previousWasSubsectionTitle = false;
-
-			if ( cntButton.isSubsectionTitle ) then
-				subsectionTitleValue = value;
-				subsectionTitleIndex = index;
-				previousWasSubsectionTitle = true;
-			else
+			if not cntButton.isSubsection then
 				UnitPopup_AddDropDownButton(info, dropdownMenu, cntButton, value);
 			end
+
+			previousButton = cntButton;
+			previousIndex = index;
+			previousValue = value;
 		end
 	end
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPEN);
+end
+
+function UnitPopup_AddDropDownTitle(unit, name, userData)
+	if ( unit or name ) then
+		info = UIDropDownMenu_CreateInfo();
+
+		local titleText = name;
+		if not titleText and unit then
+			titleText = UnitName(unit);
+		end
+
+		info.text = titleText or UNKNOWN;
+		info.isTitle = true;
+		info.notCheckable = true;
+
+		local class;
+		if unit then
+			class = select(2, UnitClass(unit));
+		end
+
+		if not class and userData and userData.guid then
+			class = select(2, GetPlayerInfoByGUID(userData.guid));
+		end
+
+		if class then
+			local colorCode = select(4, GetClassColor(class));
+			info.disablecolor = "|c" .. colorCode;
+		end
+
+		UIDropDownMenu_AddButton(info);
+	end
 end
 
 local function GetDropDownButtonText(button, dropdownMenu)
@@ -605,7 +629,26 @@ local function GetDropDownButtonText(button, dropdownMenu)
 		return button.text(dropdownMenu);
 	end
 
-	return button.text;
+	return button.text or "";
+end
+
+function UnitPopup_GetOverrideIsChecked(command, currentIsChecked)
+	if command == "LARGE_FOCUS" then
+		if GetCVarBool("fullSizeFocusFrame") then
+			return true;
+		end
+	elseif command == "VOICE_CHAT_COMMUNICATIONS_MODE_OPEN_MIC" then
+		if C_VoiceChat.GetCommunicationMode() == Enum.CommunicationMode.OpenMic then
+			return true;
+		end
+	elseif command == "VOICE_CHAT_COMMUNICATIONS_MODE_PUSH_TO_TALK" then
+		if C_VoiceChat.GetCommunicationMode() == Enum.CommunicationMode.PushToTalk then
+			return true;
+		end
+	end
+
+	-- If there was no override, use the current value
+	return currentIsChecked;
 end
 
 function UnitPopup_AddDropDownButton (info, dropdownMenu, cntButton, buttonIndex, level)
@@ -659,11 +702,8 @@ function UnitPopup_AddDropDownButton (info, dropdownMenu, cntButton, buttonIndex
 	if (level == 1) then
 		info.checked = nil;
 	end
-	if ( buttonIndex == "LARGE_FOCUS" ) then
-		if ( GetCVarBool("fullSizeFocusFrame") ) then
-			info.checked = true;
-		end
-	end
+
+	info.checked = UnitPopup_GetOverrideIsChecked(buttonIndex, info.checked);
 
 	if ( cntButton.nested ) then
 		info.hasArrow = true;
@@ -690,9 +730,51 @@ function UnitPopup_AddDropDownButton (info, dropdownMenu, cntButton, buttonIndex
 	if ( not tooltipText ) then
 		tooltipText = cntButton.tooltipText;
 	end
+
 	info.tooltipText = tooltipText;
+	info.customFrame = cntButton.customFrame;
+	if info.customFrame then
+		info.customFrame:SetContextData(dropdownMenu);
+	end
 
 	UIDropDownMenu_AddButton(info, level);
+end
+
+local function UnitPopup_GetGUID(menu)
+	if menu.unit then
+		return UnitGUID(menu.unit);
+	elseif type(menu.userData) == "table" and menu.userData.guid then
+		return menu.userData.guid;
+	end
+end
+
+local function UnitPopup_TryCreatePlayerLocation(menu, guid)
+	if menu.battlefieldScoreIndex then
+		return PlayerLocation:CreateFromBattlefieldScoreIndex(menu.battlefieldScoreIndex);
+	elseif menu.lineID then
+		return PlayerLocation:CreateFromChatLineID(menu.lineID);
+	elseif menu.unit then
+		return PlayerLocation:CreateFromUnit(menu.unit);
+	elseif guid then
+		return PlayerLocation:CreateFromGUID(guid);
+	end
+
+	return nil;
+end
+
+local function UnitPopup_HasBattleTag()
+	if BNFeaturesEnabledAndConnected() then
+		local _, battleTag = BNGetInfo();
+		if battleTag then
+			return true;
+		end
+	end
+end
+
+local function UnitPopup_GetLFGCategoryForLFGSlot(lfgSlot)
+	if lfgSlot then
+		return GetLFGCategoryForID(lfgSlot);
+	end
 end
 
 function UnitPopup_HideButtons ()
@@ -706,25 +788,14 @@ function UnitPopup_HideButtons ()
 	local inBattleground = UnitInBattleground("player");
 	local canCoop = dropdownMenu.unit and UnitCanCooperate("player", dropdownMenu.unit);
 	local isPlayer = dropdownMenu.unit and UnitIsPlayer(dropdownMenu.unit);
+	local isLocalPlayer = dropdownMenu.isLocalPlayer;
 	local partyLFGSlot = GetPartyLFGID();
-	local guid;
-	if ( dropdownMenu.unit ) then
-		guid = UnitGUID(dropdownMenu.unit);
-	elseif ( type(dropdownMenu.userData) == "table" and dropdownMenu.userData.guid ) then
-		guid = dropdownMenu.userData.guid;
-	end
-	local partyLFGCategory = nil;
-	if ( partyLFGSlot ) then
-		partyLFGCategory = GetLFGCategoryForID(partyLFGSlot);
-	end
+	local partyLFGCategory = UnitPopup_GetLFGCategoryForLFGSlot(partyLFGSlot);
+	local guid = UnitPopup_GetGUID(dropdownMenu);
+	local playerLocation = UnitPopup_TryCreatePlayerLocation(dropdownMenu, guid);
+	local haveBattleTag = UnitPopup_HasBattleTag();
 
-	local haveBattleTag;
-	if ( BNFeaturesEnabledAndConnected() ) then
-		local _, battleTag = BNGetInfo();
-		if ( battleTag ) then
-			haveBattleTag = true;
-		end
-	end
+	dropdownMenu.playerLocation = playerLocation;
 
 	for index, value in ipairs(UnitPopupMenus[UIDROPDOWNMENU_MENU_VALUE] or UnitPopupMenus[dropdownMenu.which]) do
 		UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 1;
@@ -796,11 +867,14 @@ function UnitPopup_HideButtons ()
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
 		elseif ( value == "WHISPER" ) then
-			local playerName, playerServer = UnitName("player");
-			if ( dropdownMenu.unit ) then
-				if ( not canCoop or not isPlayer or (dropdownMenu.name == playerName and dropdownMenu.server == playerServer) ) then
-					UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
-				end
+			local whisperIsLocalPlayer = isLocalPlayer;
+			if not whisperIsLocalPlayer then
+				local playerName, playerServer = UnitName("player");
+				whisperIsLocalPlayer = (dropdownMenu.name == playerName and dropdownMenu.server == playerServer);
+			end
+
+			if whisperIsLocalPlayer or ( dropdownMenu.unit and (not canCoop or not isPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
 		elseif ( value == "DUEL" ) then
 			if ( UnitCanAttack("player", dropdownMenu.unit) or not isPlayer ) then
@@ -853,16 +927,19 @@ function UnitPopup_HideButtons ()
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
 		elseif ( value == "REPORT_PLAYER" ) then
-			if ( (not isPlayer) and (not dropdownMenu.battlefieldScoreIndex) and
-				(not dropdownMenu.lineID or not CanComplainChat(dropdownMenu.lineID)) ) then
+			if not playerLocation or not C_ChatInfo.CanReportPlayer(playerLocation) then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
 		elseif ( value == "REPORT_SPAM" ) then
-			if ( not dropdownMenu.lineID or not CanComplainChat(dropdownMenu.lineID) ) then
+			if not playerLocation or not playerLocation:IsChatLineID() then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
 		elseif ( value == "REPORT_BAD_LANGUAGE" ) then
-			if ( not dropdownMenu.lineID or not CanComplainChat(dropdownMenu.lineID) ) then
+			if not playerLocation or not playerLocation:IsChatLineID() then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
+		elseif ( value == "REPORT_BAD_LANGUAGE_VOICE" ) then
+			if not playerLocation then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
 		elseif ( value == "POP_OUT_CHAT" ) then
@@ -1128,28 +1205,27 @@ function UnitPopup_HideButtons ()
 					end
 				end
 			end
-
 		elseif ( value == "CHAT_PROMOTE" ) then
-			if ( dropdownMenu.category == "CHANNEL_CATEGORY_GROUP" ) then
+			if ( dropdownMenu.channelType ~= Enum.ChatChannelType.Custom ) then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			else
-				if ( not IsDisplayChannelOwner() or dropdownMenu.owner or dropdownMenu.moderator or dropdownMenu.name == UnitName("player") ) then
+				if ( not IsDisplayChannelOwner() or dropdownMenu.owner or dropdownMenu.moderator or dropdownMenu.name == UnitName("player") ) then -- TODO: Name matching is wrong here, needs full name comparison
 					UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 				end
 			end
 		elseif ( value == "CHAT_DEMOTE" ) then
-			if ( dropdownMenu.category == "CHANNEL_CATEGORY_GROUP" ) then
+			if ( dropdownMenu.channelType ~= Enum.ChatChannelType.Custom ) then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			else
-				if ( not IsDisplayChannelOwner() or dropdownMenu.owner or not dropdownMenu.moderator or dropdownMenu.name == UnitName("player") ) then
+				if ( not IsDisplayChannelOwner() or dropdownMenu.owner or not dropdownMenu.moderator or dropdownMenu.name == UnitName("player") ) then -- TODO: Name matching is wrong here, needs full name comparison
 					UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 				end
 			end
 		elseif ( value == "CHAT_OWNER" ) then
-			if ( dropdownMenu.category == "CHANNEL_CATEGORY_GROUP" ) then
+			if ( dropdownMenu.channelType ~= Enum.ChatChannelType.Custom ) then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			else
-				if ( not IsDisplayChannelOwner() or dropdownMenu.owner or dropdownMenu.name == UnitName("player") ) then
+				if ( not IsDisplayChannelOwner() or dropdownMenu.owner or dropdownMenu.name == UnitName("player") ) then -- TODO: Name matching needs full name comparison
 					UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 				end
 			end
@@ -1175,6 +1251,30 @@ function UnitPopup_HideButtons ()
 			if ( not dropdownMenu.unit or not GetGuildInfo(dropdownMenu.unit) ) then
 				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
 			end
+		elseif ( value == "VOICE_CHAT_SPEAKER_VOLUME" ) then
+			if ( not (dropdownMenu.voiceMemberID and isLocalPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
+		elseif value == "VOICE_CHAT_MICROPHONE_VOLUME" then
+			if ( not (dropdownMenu.voiceMemberID and isLocalPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
+		elseif value == "VOICE_CHAT_COMMUNICATIONS_MODE_OPEN_MIC" then
+			if ( not (dropdownMenu.voiceMemberID and isLocalPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
+		elseif value == "VOICE_CHAT_COMMUNICATIONS_MODE_PUSH_TO_TALK" then
+			if ( not (dropdownMenu.voiceMemberID and isLocalPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
+		elseif value == "VOICE_CHAT_SETTINGS" then
+			if ( not (dropdownMenu.voiceMemberID and isLocalPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
+		elseif value == "VOICE_CHAT_USER_VOLUME" then
+			if ( not (dropdownMenu.voiceMemberID and not isLocalPlayer) ) then
+				UnitPopupShown[UIDROPDOWNMENU_MENU_LEVEL][index] = 0;
+			end
 		end
 	end
 end
@@ -1184,13 +1284,8 @@ function UnitPopup_OnUpdate (elapsed)
 		return;
 	end
 
-	-- If none of the untipopup frames are visible then return
-	for index, value in ipairs(UnitPopupFrames) do
-		if ( UIDROPDOWNMENU_OPEN_MENU == _G[value] ) then
-			break;
-		elseif ( index == #UnitPopupFrames ) then
-			return;
-		end
+	if ( not UnitPopup_HasVisibleMenu() ) then
+		return;
 	end
 
 	local currentDropDown = UIDROPDOWNMENU_OPEN_MENU;
@@ -1452,37 +1547,14 @@ function UnitPopup_OnClick (self)
 	elseif ( button == "IGNORE" ) then
 		AddOrDelIgnore(fullname);
 	elseif ( button == "REPORT_SPAM" ) then
-		local dialog = StaticPopup_Show("CONFIRM_REPORT_SPAM_CHAT", fullname);
-		if ( dialog ) then
-			dialog.data = dropdownFrame.unit or tonumber(dropdownFrame.lineID);
-		end
+		StaticPopup_Show("CONFIRM_REPORT_SPAM_CHAT", fullname, nil, dropdownFrame.playerLocation);
 	elseif ( button == "REPORT_BAD_LANGUAGE" ) then
-		local dialog = StaticPopup_Show("CONFIRM_REPORT_BAD_LANGUAGE_CHAT", fullname);
-		if ( dialog ) then
-			dialog.data = dropdownFrame.unit or tonumber(dropdownFrame.lineID);
-		end
+		StaticPopup_Show("CONFIRM_REPORT_BAD_LANGUAGE_CHAT", fullname, nil, dropdownFrame.playerLocation);
+	elseif ( button == "REPORT_BAD_LANGUAGE_VOICE" ) then
+		StaticPopup_Show("CONFIRM_REPORT_BAD_LANGUAGE_VOICE", fullname, nil, dropdownFrame.playerLocation);
 	elseif ( button == "REPORT_BAD_NAME" or button == "REPORT_BAD_GUILD_NAME" ) then
-		if ( GMEuropaComplaintsEnabled() and not GMQuickTicketSystemThrottled() ) then
-			local target = "pending";
-			if (dropdownFrame.unit) then
-				SetPendingReportTarget(dropdownFrame.unit);
-			elseif (tonumber(dropdownFrame.lineID)) then
-				target = tonumber(dropdownFrame.lineID);
-			elseif (dropdownFrame.battlefieldScoreIndex) then
-				BattlefieldSetPendingReportTarget(dropdownFrame.battlefieldScoreIndex);
-			end
-
-			local reportType = button == "REPORT_BAD_NAME" and PLAYER_REPORT_TYPE_BAD_PLAYER_NAME or PLAYER_REPORT_TYPE_BAD_GUILD_NAME;
-			ReportPlayer(reportType, target);
-		else
-			UIErrorsFrame:AddMessage(ERR_REPORT_SUBMISSION_FAILED , 1.0, 0.1, 0.1, 1.0);
-			local info = ChatTypeInfo["SYSTEM"];
-			if ( dropdownFrame.chatFrame ) then
-				dropdownFrame.chatFrame:AddMessage(ERR_REPORT_SUBMISSION_FAILED, info.r, info.g, info.b);
-			else
-				DEFAULT_CHAT_FRAME:AddMessage(ERR_REPORT_SUBMISSION_FAILED, info.r, info.g, info.b);
-			end
-		end
+		local reportType = button == "REPORT_BAD_NAME" and PLAYER_REPORT_TYPE_BAD_PLAYER_NAME or PLAYER_REPORT_TYPE_BAD_GUILD_NAME;
+		C_ChatInfo.ReportPlayer(reportType, dropdownFrame.playerLocation);
 	elseif ( button == "REPORT_PET" ) then
 		SetPendingReportPetTarget(unit);
 		StaticPopup_Show("CONFIRM_REPORT_PET_NAME", fullname);
@@ -1490,25 +1562,7 @@ function UnitPopup_OnClick (self)
 		C_PetBattles.SetPendingReportTargetFromUnit(unit);
 		StaticPopup_Show("CONFIRM_REPORT_BATTLEPET_NAME", fullname);
 	elseif ( button == "REPORT_CHEATING" ) then
-		if ( GMEuropaComplaintsEnabled() and not GMQuickTicketSystemThrottled() ) then
-			if (dropdownFrame.unit) then
-				HelpFrame_SetReportPlayerByUnitTag(ReportCheatingDialog, dropdownFrame.unit);
-			elseif (tonumber(dropdownFrame.lineID)) then
-				HelpFrame_SetReportPlayerByLineID(ReportCheatingDialog, tonumber(dropdownFrame.lineID));
-			elseif (dropdownFrame.battlefieldScoreIndex) then
-				HelpFrame_SetReportPlayerByBattlefieldScoreIndex(ReportCheatingDialog, dropdownFrame.battlefieldScoreIndex);
-			end
-
-			HelpFrame_ShowReportCheatingDialog();
-		else
-			UIErrorsFrame:AddMessage(ERR_REPORT_SUBMISSION_FAILED , 1.0, 0.1, 0.1, 1.0);
-			local info = ChatTypeInfo["SYSTEM"];
-			if ( dropdownFrame.chatFrame ) then
-				dropdownFrame.chatFrame:AddMessage(ERR_REPORT_SUBMISSION_FAILED, info.r, info.g, info.b);
-			else
-				DEFAULT_CHAT_FRAME:AddMessage(ERR_REPORT_SUBMISSION_FAILED, info.r, info.g, info.b);
-			end
-		end
+		HelpFrame_ShowReportCheatingDialog(dropdownFrame.playerLocation);
 	elseif ( button == "POP_OUT_CHAT" ) then
 		FCF_OpenTemporaryWindow(dropdownFrame.chatType, dropdownFrame.chatTarget, dropdownFrame.chatFrame, true);
 	elseif ( button == "DUEL" ) then
@@ -1747,7 +1801,14 @@ function UnitPopup_OnClick (self)
 		CloseDropDownMenus();
 	elseif ( button == "GARRISON_VISIT" ) then
 		C_Garrison.SetUsingPartyGarrison( not C_Garrison.IsUsingPartyGarrison());
+	elseif ( button == "VOICE_CHAT_COMMUNICATIONS_MODE_OPEN_MIC" ) then
+		C_VoiceChat.SetCommunicationMode(Enum.CommunicationMode.OpenMic);
+	elseif ( button == "VOICE_CHAT_COMMUNICATIONS_MODE_PUSH_TO_TALK" ) then
+		C_VoiceChat.SetCommunicationMode(Enum.CommunicationMode.PushToTalk);
+	elseif ( button == "VOICE_CHAT_SETTINGS" ) then
+		ChannelFrame:ToggleVoiceSettings();
 	end
+
 	PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON);
 end
 

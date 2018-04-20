@@ -43,6 +43,7 @@ LFG_LIST_PER_EXPANSION_TEXTURES = {
 	[4] = "mists",
 	[5] = "warlords",
 	[6] = "legion",
+	[7] = "legion",
 }
 
 LFG_LIST_GROUP_DATA_ATLASES = {
@@ -878,6 +879,7 @@ end
 
 function LFGListEntryCreation_ListGroupInternal(self, activityID, name, itemLevel, honorLevel, voiceChatInfo, description, autoAccept, privateGroup, questID)
 	if ( LFGListEntryCreation_IsEditMode(self) ) then
+		local _;
 		autoAccept, _, questID = select(9, C_LFGList.GetActiveEntryInfo());
 		C_LFGList.UpdateListing(activityID, name, itemLevel, honorLevel, voiceChatInfo, description, autoAccept, privateGroup, questID);
 		LFGListFrame_SetActivePanel(self:GetParent(), self:GetParent().ApplicationViewer);
@@ -2688,6 +2690,7 @@ function LFGListUtil_AugmentWithBest(filters, categoryID, groupID, activityID)
 	assert(activityID);
 
 	--Update the categoryID and groupID with what we get from the activity
+	local _;
 	categoryID, groupID, _, filters = select(ACTIVITY_RETURN_VALUES.categoryID, C_LFGList.GetActivityInfo(activityID));
 
 	--Update the filters if needed
@@ -2758,7 +2761,7 @@ function LFGListUtil_GetDecoratedCategoryName(categoryName, filter, useColors)
 		colorStart = "|cffffffff";
 		colorEnd = "|r";
 	end
-
+	
 	local extraName = "";
 	if ( filter == LE_LFG_LIST_FILTER_NOT_RECOMMENDED ) then
 		extraName = LFG_LIST_LEGACY;
@@ -3092,7 +3095,6 @@ end
 LFG_LIST_ACTIVE_QUEUE_MESSAGE_EVENTS = {
 	"LFG_LIST_ACTIVE_ENTRY_UPDATE",
 	"LFG_LIST_SEARCH_RESULT_UPDATED",
-	"PVP_ROLE_CHECK_UPDATED",
 	"UPDATE_BATTLEFIELD_STATUS",
 	"LFG_UPDATE",
 	"LFG_ROLE_CHECK_UPDATE",

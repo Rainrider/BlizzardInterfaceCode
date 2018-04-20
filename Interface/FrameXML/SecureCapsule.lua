@@ -137,6 +137,10 @@ retain("ConvertPixelsToUI");
 retain("IsTrialAccount");
 retain("IsVeteranTrialAccount");
 retain("C_StorePublic");
+retain("C_Club");
+retain("UnitFactionGroup");
+retain("FrameUtil");
+retain("strlenutf8");
 
 --For auth challenge
 take("C_AuthChallenge");
@@ -420,6 +424,7 @@ retain("OPTIONS");
 retain("FACTION_HORDE");
 retain("FACTION_ALLIANCE");
 retain("LIST_DELIMITER");
+retain("FEATURE_NOT_AVAILBLE_PANDAREN");
 
 take("BLIZZARD_CHALLENGE_SUBMIT");
 take("BLIZZARD_CHALLENGE_CANCEL");
@@ -434,6 +439,30 @@ take("BLIZZARD_CHALLENGE_SCREEN_EXPLANATION");
 take("SEND_ITEMS_TO_STRANGER_WARNING");
 take("SEND_MONEY_TO_STRANGER_WARNING");
 take("TRADE_ACCEPT_CONFIRMATION");
+
+retain("COMMUNITIES_CREATE_COMMUNITY");
+retain("COMMUNITIES_ADD_DIALOG_CREATE_WOW_LABEL");
+retain("COMMUNITIES_ADD_DIALOG_CREATE_WOW_LABEL_NO_FACTION");
+retain("COMMUNITIES_ADD_DIALOG_CREATE_WOW_DESCRIPTION");
+retain("COMMUNITIES_ADD_DIALOG_CREATE_WOW_DESCRIPTION_NO_FACTION");
+retain("COMMUNITIES_ADD_DIALOG_CREATE_BNET_LABEL");
+retain("COMMUNITIES_ADD_DIALOG_CREATE_BNET_DESCRIPTION");
+retain("COMMUNITIES_ADD_DIALOG_INVITE_LINK_LABEL");
+retain("COMMUNITIES_ADD_DIALOG_INVITE_LINK_DESCRIPTION");
+retain("COMMUNITIES_ADD_DIALOG_INVITE_LINK_JOIN");
+retain("COMMUNITIES_ADD_DIALOG_BATTLE_NET_LABEL");
+retain("COMMUNITIES_ADD_DIALOG_WOW_LABEL");
+retain("COMMUNITIES_ADD_DIALOG_LABEL");
+retain("COMMUNITIES_CREATE_DIALOG_WOW_LABEL");
+retain("COMMUNITIES_CREATE_DIALOG_BATTLE_NET_LABEL");
+retain("COMMUNITIES_CREATE_DIALOG_ICON_SELECTION_BUTTON");
+retain("COMMUNITIES_CREATE_DIALOG_AVATAR_PICKER_INSTRUCTIONS");
+retain("COMMUNITIES_CREATE_DIALOG_NAME_INSTRUCTIONS");
+retain("COMMUNITIES_CREATE_DIALOG_DESCRIPTION_INSTRUCTIONS");
+retain("COMMUNITIES_CREATE_DIALOG_TYPE_LABEL");
+retain("COMMUNITIES_CREATE_DIALOG_NAME_LABEL");
+retain("COMMUNITIES_CREATE_DIALOG_DESCRIPTION_LABEL");
+retain("COMMUNITIES_CREATE_DIALOG_ICON_LABEL");
 
 --Lua enums
 retain("LE_TOKEN_RESULT_SUCCESS");
@@ -456,6 +485,7 @@ takeenum("BattlepaySpecialProducts");
 takeenum("BattlepayProductGroupFlag");
 takeenum("BattlepayGroupDisplayType");
 retainenum("ModelSceneSetting");
+retainenum("ClubType");
 
 -- Secure Mixins
 -- where ... are the mixins to mixin
@@ -487,3 +517,4 @@ take("SecureMixin");
 take("CreateFromSecureMixins");
 
 retain("ShrinkUntilTruncateFontStringMixin");
+retain("PortraitFrameTemplateMixin");

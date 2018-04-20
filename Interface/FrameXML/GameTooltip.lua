@@ -86,6 +86,13 @@ function GameTooltip_SetDefaultAnchor(tooltip, parent)
 	tooltip.default = 1;
 end
 
+function GameTooltip_SetBasicTooltip(tooltip, text, x, y)
+	tooltip:SetOwner(UIParent, "ANCHOR_NONE");
+	tooltip:ClearAllPoints();
+	tooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x, y);
+	tooltip:SetText(text, HIGHLIGHT_FONT_COLOR:GetRGB());
+end
+
 function GameTooltip_AddBlankLinesToTooltip(tooltip, numLines)
 	while numLines ~= nil and numLines > 0 do
 		tooltip:AddLine(" ");
@@ -115,7 +122,7 @@ function GameTooltip_AddQuestRewardsToTooltip(tooltip, questID, style)
 			hasAnySingleLineRewards = true;
 		end
 		-- currency
-		local numAddedQuestCurrencies = QuestUtils_AddQuestCurrencyRewardsToTooltip(questID, tooltip);
+		local numAddedQuestCurrencies = QuestUtils_AddQuestCurrencyRewardsToTooltip(questID, tooltip, tooltip.ItemTooltip);
 		if ( numAddedQuestCurrencies > 0 ) then
 			hasAnySingleLineRewards = true;
 		end
@@ -133,7 +140,7 @@ function GameTooltip_AddQuestRewardsToTooltip(tooltip, questID, style)
 		end
 
 		-- items
-		local numQuestRewards = GetNumQuestLogRewards(questID);
+		local numQuestRewards = GetNumQuestLogRewards(questID); 
 		if numQuestRewards > 0 then
 			if ( hasAnySingleLineRewards ) then
 				tooltip:AddLine(" ");
@@ -253,7 +260,7 @@ end
 
 function GameTooltip_InsertFrame(tooltipFrame, frame)
 	local textSpacing = 2;
-	local textHeight = _G[tooltipFrame:GetName().."TextLeft2"]:GetHeight();
+	local textHeight = _G[tooltipFrame:GetName().."TextLeft2"]:GetLineHeight();
 	local numLinesNeeded = math.ceil(frame:GetHeight() / (textHeight + textSpacing));
 	local currentLine = tooltipFrame:NumLines();
 	for i = 1, numLinesNeeded do

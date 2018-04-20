@@ -135,6 +135,8 @@ end
 
 function GarrisonFollowerMission:OnShowMainFrame()
 	GarrisonMission.OnShowMainFrame(self);
+	self.abilityCountersForMechanicTypes = C_Garrison.GetFollowerAbilityCountersForMechanicTypes(self.followerTypeID);
+
 	if (self.FollowerList.followerType ~= self.followerTypeID) then
 		self.FollowerList:Initialize(self.followerTypeID);
 	end
@@ -1368,20 +1370,6 @@ end
 ---------------------------------------------------------------------------------
 --- Mission Page: Placing Followers/Starting Mission                          ---
 ---------------------------------------------------------------------------------
-function GarrisonFollowerListButton_OnDragStart(self, button)
-	local mainFrame = self:GetFollowerList():GetParent();
-	if (mainFrame.OnDragStartFollowerButton) then
-		mainFrame:OnDragStartFollowerButton(GarrisonFollowerPlacer, self, 24);
-	end
-end
-
-function GarrisonFollowerListButton_OnDragStop(self)
-	local mainFrame = self:GetFollowerList():GetParent();
-	if (mainFrame.OnDragStopFollowerButton) then
-		mainFrame:OnDragStopFollowerButton(GarrisonFollowerPlacer);
-	end
-end
-
 function GarrisonMissionPageFollowerFrame_OnDragStart(self)
 	local mainFrame = self:GetParent():GetParent():GetParent();
 	mainFrame:OnDragStartMissionFollower(GarrisonFollowerPlacer, self, 24);
@@ -1596,6 +1584,7 @@ local ANIMATION_CONTROL = {
 		[14] = { duration = 0,		onStartFunc = GarrisonMissionComplete.AnimSkipNext },				-- click Next button if we're in skip mode
 	}
 };
+ANIMATION_CONTROL[LE_FOLLOWER_TYPE_GARRISON_8_0] = ANIMATION_CONTROL[LE_FOLLOWER_TYPE_GARRISON_7_0];
 
 function GarrisonFollowerMissionComplete:SetAnimationControl()
 	self.animationControl = ANIMATION_CONTROL[self:GetParent().followerTypeID];

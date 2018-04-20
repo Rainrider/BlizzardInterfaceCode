@@ -80,6 +80,7 @@ Import("CreateFromSecureMixins");
 Import("ShrinkUntilTruncateFontStringMixin");
 Import("IsTrialAccount");
 Import("IsVeteranTrialAccount");
+Import("PortraitFrameTemplateMixin");
 
 --GlobalStrings
 Import("BLIZZARD_STORE");
@@ -1824,6 +1825,10 @@ end
 
 function StoreFrame_IsProductGroupDisabled(groupID)
 	local productGroupInfo = C_StoreSecure.GetProductGroupInfo(groupID);
+	if not productGroupInfo then
+		return true;
+	end
+
 	local displayAsDisabled = productGroupInfo.disabledTooltip ~= nil and not StoreFrame_DoesProductGroupHavePurchasableItems(groupID);
 	local enabledForTrial = bit.band(productGroupInfo.flags, Enum.BattlepayProductGroupFlag.EnabledForTrial) == Enum.BattlepayProductGroupFlag.EnabledForTrial;
 	local trialRestricted = IsTrialAccount() and not enabledForTrial;
@@ -1871,7 +1876,7 @@ function StoreFrame_UpdateCategories(self)
 			--[[
 							WARNING: ScopeModifiers don't work for templates!
 				These functions will fail to load properly if this template is instantiated outside
-				of the initial LoadAddon call becuase we'll have lost the scoped modifiers and the
+				of the initial LoadAddon call because we'll have lost the scoped modifiers and the
 				reference to the addon environment if we instantiate them later.
 
 				We have to manually set these scripts (below) for them to work properly.

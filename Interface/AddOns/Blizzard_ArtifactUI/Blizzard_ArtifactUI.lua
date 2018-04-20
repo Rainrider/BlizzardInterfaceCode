@@ -64,7 +64,6 @@ function ArtifactUIMixin:OnLoad()
 
 	self:RegisterEvent("ARTIFACT_UPDATE");
 	self:RegisterEvent("ARTIFACT_CLOSE");
-	self:RegisterEvent("ARTIFACT_MAX_RANKS_UPDATE");
 end
 
 function ArtifactUIMixin:OnShow()
@@ -267,7 +266,13 @@ function ArtifactUIMixin:OnKnowledgeEnter(knowledgeFrame)
 		end
 	end
 	
+	knowledgeFrame.UpdateTooltip = function() self:OnKnowledgeEnter(knowledgeFrame); end;
 	GameTooltip:Show();
+end
+
+function ArtifactUIMixin:OnKnowledgeLeave(knowledgeFrame)
+	knowledgeFrame.UpdateTooltip = nil;
+	GameTooltip:Hide();
 end
 
 function ArtifactUIMixin:OnInventoryItemMouseEnter(bag, slot)

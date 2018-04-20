@@ -534,6 +534,7 @@ function WardrobeTransmogButton_OnEnter(self)
 		end
 	end
 	WardrobeTransmogFrame.Model.controlFrame:Show();
+	self.UpdateTooltip = self.OnEnter;
 end
 
 function WardrobeTransmogButton_OnLeave(self)
@@ -542,6 +543,7 @@ function WardrobeTransmogButton_OnLeave(self)
 	end
 	WardrobeTransmogFrame.Model.controlFrame:Hide();
 	GameTooltip:Hide();
+	self.UpdateTooltip = nil;
 end
 
 function WardrobeTransmogButton_Select(button, fromOnClick)
@@ -2722,8 +2724,8 @@ function WardrobeFilterDropDown_InitializeBaseSets(self, level)
 	info.checked = C_TransmogSets.GetBaseSetsFilter(LE_TRANSMOG_SET_FILTER_UNCOLLECTED);
 	UIDropDownMenu_AddButton(info, level);
 
-	UIDropDownMenu_AddSeparator(info);
-	-- reset to remove separator
+	UIDropDownMenu_AddSeparator();
+
 	info = UIDropDownMenu_CreateInfo();
 	info.keepShownOnClick = true;
 	info.isNotRadio = true;

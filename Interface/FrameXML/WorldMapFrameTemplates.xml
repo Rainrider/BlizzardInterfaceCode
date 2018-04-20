@@ -64,14 +64,14 @@
 		</Layers>
 		<Scripts>
 			<OnEnter>
-				local questLineName, questName, _, _, _, floorLocation, isLegendary = C_Questline.GetQuestlineInfoByIndex(self.index);
-				if ( questName ) then
+				local questInfo = C_QuestLine.GetQuestLineInfo(self.questID, self.mapID);
+				if ( questInfo ) then
 					WorldMapTooltip:SetOwner(self, "ANCHOR_LEFT");
-					WorldMapTooltip:SetText(questName);
+					WorldMapTooltip:SetText(questInfo.questName);
 					WorldMapTooltip:AddLine(AVAILABLE_QUEST, 1, 1, 1, true);
-					if (floorLocation == LE_QUESTLINE_FLOOR_LOCATION_BELOW) then
+					if (questInfo.floorLocation == Enum.QuestLineFloorLocation.Below) then
 						WorldMapTooltip:AddLine(QUESTLINE_LOCATED_BELOW, 0.5, 0.5, 0.5, true);
-					elseif (floorLocation == LE_QUESTLINE_FLOOR_LOCATION_ABOVE) then
+					elseif (questInfo.floorLocation == Enum.QuestLineFloorLocation.Above) then
 						WorldMapTooltip:AddLine(QUESTLINE_LOCATED_ABOVE, 0.5, 0.5, 0.5, true);
 					end
 					WorldMapTooltip:Show();
@@ -157,7 +157,8 @@
 				self.petMaxLevel = MAELSTROM_ZONES_LEVELS[zoneName].petMaxLevel;
 			</OnLoad>
 			<OnEnter>
-				WorldMapFrame.maelstromZoneText = GetMapNameByID(self.zoneID);
+				local mapInfo = C_Map.GetMapInfo(self.zoneID);
+				WorldMapFrame.maelstromZoneText = mapInfo and mapInfo.name or nil;
 				WorldMapFrame.minLevel = self.minLevel;
 				WorldMapFrame.maxLevel = self.maxLevel;
 				WorldMapFrame.petMinLevel = self.petMinLevel;
@@ -293,7 +294,7 @@
 		</Layers>
 	</Frame>
 
-	<Frame name="WorldMapBountyBoardTemplate" mixin="WorldMapBountyBoardMixin" enableMouse="true" virtual="true">
+	<Frame name="WorldMapBountyBoardTemplate" frameStrata="HIGH" mixin="WorldMapBountyBoardMixin" enableMouse="true" virtual="true">
 		<Size x="244" y="103" />
 		<HitRectInsets left="35" right="35" top="40" bottom="5" />
 		<Layers>
@@ -377,7 +378,7 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="WorldMapActionButtonTemplate" mixin="WorldMapActionButtonMixin" virtual="true">
+	<Frame name="WorldMapActionButtonTemplate" frameStrata="HIGH" mixin="WorldMapActionButtonMixin" virtual="true">
 		<Size x="101" y="86" />
 		<Layers>
 			<Layer level="ARTWORK" textureSubLevel="1">
@@ -431,6 +432,7 @@
 			</Button>
 		</Frames>
 		<Scripts>
+			<OnLoad method="OnLoad" />
 			<OnEvent method="OnEvent" />
 		</Scripts>
 	</Frame>

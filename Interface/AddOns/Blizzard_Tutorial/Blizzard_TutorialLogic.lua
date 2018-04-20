@@ -152,7 +152,7 @@ function TutorialHelper:GetActionButtonBySpellID(spellID)
 	-- backup for stance bars
 	for i = 1, 10 do
 		local btn = _G["StanceButton" .. i];
-		local icon, name, isActive, isCastable, sID = GetShapeshiftFormInfo(btn:GetID());
+		local icon, isActive, isCastable, sID = GetShapeshiftFormInfo(btn:GetID());
 
 		if (sID == spellID) then
 			return btn;
@@ -717,7 +717,7 @@ end
 local Class_Intro_MapHighlights = class("Intro_MapHighlights", Class_TutorialBase);
 
 function Class_Intro_MapHighlights:OnBegin()
-	self.MapAreaID = GetCurrentMapAreaID();
+	self.MapID = WorldMapFrame:GetMapID();
 
 	self.Prompt = NPE_MAPCALLOUTBASE;
 	local hasBlob = false;
@@ -754,7 +754,8 @@ function Class_Intro_MapHighlights:Display()
 end
 
 function Class_Intro_MapHighlights:WORLD_MAP_UPDATE()
-	if (GetCurrentMapAreaID() ~= self.MapAreaID) then
+	local mapID = WorldMapFrame:GetMapID();
+	if (mapID ~= self.MapID) then
 		self:Suppress();
 	else
 		self:Unsuppress();
@@ -915,10 +916,10 @@ function Class_ActionBarCallout:Warrior_AttemptPointer2()
 		self:Warrior_InitiatePointer2();
 	else
 		local unitPowerID; -- this local must exist before the closure below is constructed
-		unitPowerID = Dispatcher:RegisterEvent("UNIT_POWER", function()
+		unitPowerID = Dispatcher:RegisterEvent("UNIT_POWER_UPDATE", function()
 				if (UnitPower('player') >= requiredRage) then
 					self:Warrior_InitiatePointer2();
-					Dispatcher:UnregisterEvent("UNIT_POWER", unitPowerID);
+					Dispatcher:UnregisterEvent("UNIT_POWER_UPDATE", unitPowerID);
 				end
 			end);
 	end
@@ -1478,11 +1479,9 @@ end
 
 -- Watch for units dying while in combat.  if that happened, check the unit to see if the
 -- player can loot it and if so, prompt the player to loot
-function Class_LootCorpseWatcher:COMBAT_LOG_EVENT_UNFILTERED(timestamp, logEvent, ...)
-	if ((logEvent == "UNIT_DIED") or (logEvent == "UNIT_DESTROYED")) then
-		--- !!! VarArgs can't be passed into closures
-		local unitGUID = select(6, ...);
-
+function Class_LootCorpseWatcher:COMBAT_LOG_EVENT_UNFILTERED(timestamp, logEvent)
+	local logEvent, _, _, _, _, unitGUID = CombatLogGetCurrentEventInfo();
+	if logEvent == "UNIT_DIED" or logEvent == "UNIT_DESTROYED" then
 		-- Wait for mirror data
 		C_Timer.After(1, function()
 				if CanLootUnit(unitGUID) then
@@ -1789,7 +1788,7 @@ local Class_ShowMapQuestTurnIn = class("ShowMapQuestTurnIn", Class_TutorialBase)
 
 -- @param questData: Class QuestData (QuestManager.lua)
 function Class_ShowMapQuestTurnIn:OnBegin(questData)
-	self.MapAreaID = GetCurrentMapAreaID();
+	self.MapID = WorldMapFrame:GetMapID();
 
 	-- This should no longer ever happen, but it's a good safety check anyway.
 	if (not questData) then
@@ -1804,12 +1803,13 @@ function Class_ShowMapQuestTurnIn:OnBegin(questData)
 	Dispatcher:RegisterScript(WorldMapFrame, "OnHide", function() self:Complete(); end, true);
 end
 
+-- MAPREFACTORTODO: Replace this somehow? Event is going away
 function Class_ShowMapQuestTurnIn:WORLD_MAP_UPDATE()
-	local newArea = GetCurrentMapAreaID();
-	if (newArea ~= self.MapAreaID) then
-		self:Display();
-		self.MapAreaID = newArea;
-	end
+	--local newMapID = C_Map.GetCurrentMapID();
+	--if (newMapID ~= self.MapID) then
+	--	self:Display();
+	--	self.MapID = newMapID;
+	--end
 end
 
 function Class_ShowMapQuestTurnIn:Display()
@@ -2489,10 +2489,11 @@ function Class_Taxi:OnBegin()
 end
 
 function Class_Taxi:TAXIMAP_OPENED()
-	if TaxiFrame_ShouldShowOldStyle() then
+-- MAPREFACTORTODO - query the taxi map type
+--	if TaxiFrame_ShouldShowOldStyle() then
 		self:ShowPointerTutorial(str(NPE_TAXICALLOUT), "LEFT", TaxiRouteMap, -10, 0);
 		Dispatcher:RegisterScript(TaxiFrame, "OnHide", function() self:Complete() end);
-	end
+--	end
 end
 
 -- ------------------------------------------------------------------------------------------------------------

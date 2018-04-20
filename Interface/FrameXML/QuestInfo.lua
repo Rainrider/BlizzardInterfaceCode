@@ -7,6 +7,15 @@ local SEAL_QUESTS = {
 	[47835] = { bgAtlas = "QuestBG-TheHandofFate", },
 	[49929] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal" },
 	[49930] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal" },
+	[50476] = { bgAtlas = "QuestBG-Horde", sealAtlas = "Quest-Horde-WaxSeal" },
+	-- BfA start quests
+	[46727] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal" },
+	[50668] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
+
+	[51795] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
+	[52058] = { bgAtlas = "QuestBG-Alliance", text = "|cff042c54"..QUEST_KING_ANDUIN_WRYNN.."|r", sealAtlas = "Quest-Alliance-WaxSeal"},
+
+	[51796] = { bgAtlas = "QuestBG-Horde", text = "|cff480404"..QUEST_WARCHIEF_SYLVANAS_WINDRUNNER.."|r", sealAtlas = "Quest-Horde-WaxSeal"},
 };
 
 function QuestInfoTimerFrame_OnUpdate(self, elapsed)
@@ -93,6 +102,7 @@ function QuestInfo_Display(template, parentFrame, acceptButton, material, mapVie
 		local shownFrame, bottomShownFrame = elementsTable[i](parentFrame);
 		if ( shownFrame ) then
 			shownFrame:SetParent(parentFrame);
+			shownFrame:ClearAllPoints();
 			if ( lastFrame ) then
 				shownFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", elementsTable[i+1], elementsTable[i+2]);
 			else
@@ -371,6 +381,7 @@ QUEST_SPELL_REWARD_TYPE_TRADESKILL_SPELL = 2;
 QUEST_SPELL_REWARD_TYPE_ABILITY = 3;
 QUEST_SPELL_REWARD_TYPE_AURA = 4;
 QUEST_SPELL_REWARD_TYPE_SPELL = 5;
+QUEST_SPELL_REWARD_TYPE_UNLOCK = 6;
 
 QUEST_INFO_SPELL_REWARD_ORDERING = {
 	QUEST_SPELL_REWARD_TYPE_FOLLOWER,
@@ -378,6 +389,7 @@ QUEST_INFO_SPELL_REWARD_ORDERING = {
 	QUEST_SPELL_REWARD_TYPE_ABILITY,
 	QUEST_SPELL_REWARD_TYPE_AURA,
 	QUEST_SPELL_REWARD_TYPE_SPELL,
+	QUEST_SPELL_REWARD_TYPE_UNLOCK,
 };
 
 QUEST_INFO_SPELL_REWARD_TO_HEADER = {
@@ -386,6 +398,7 @@ QUEST_INFO_SPELL_REWARD_TO_HEADER = {
 	[QUEST_SPELL_REWARD_TYPE_ABILITY] = REWARD_ABILITY,
 	[QUEST_SPELL_REWARD_TYPE_AURA] = REWARD_AURA,
 	[QUEST_SPELL_REWARD_TYPE_SPELL] = REWARD_SPELL,
+	[QUEST_SPELL_REWARD_TYPE_UNLOCK] = REWARD_UNLOCK,
 };
 
 local function AddSpellToBucket(spellBuckets, type, rewardSpellIndex)
@@ -443,7 +456,7 @@ function QuestInfo_ShowRewards()
 	end
 
 	for rewardSpellIndex = 1, numSpellRewards do
-		local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, spellID = spellGetter(rewardSpellIndex);
+		local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID = spellGetter(rewardSpellIndex);
 		local knownSpell = IsSpellKnownOrOverridesKnown(spellID);
 
 		-- only allow the spell reward if user can learn it
@@ -557,7 +570,7 @@ function QuestInfo_ShowRewards()
 		local spellBuckets = {};
 
 		for rewardSpellIndex = 1, numSpellRewards do
-			local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, spellID = spellGetter(rewardSpellIndex);
+			local texture, name, isTradeskillSpell, isSpellLearned, hideSpellLearnText, isBoostSpell, garrFollowerID, genericUnlock, spellID = spellGetter(rewardSpellIndex);
 			local knownSpell = IsSpellKnownOrOverridesKnown(spellID);
 			if texture and not knownSpell and (not isBoostSpell or IsCharacterNewlyBoosted()) and (not garrFollowerID or not C_Garrison.IsFollowerCollected(garrFollowerID)) then
 				if ( isTradeskillSpell ) then
@@ -566,10 +579,12 @@ function QuestInfo_ShowRewards()
 					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_ABILITY, rewardSpellIndex);
 				elseif ( garrFollowerID ) then
 					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_FOLLOWER, rewardSpellIndex);
-				elseif ( not isSpellLearned ) then
-					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_AURA, rewardSpellIndex);
-				else
+				elseif ( isSpellLearned ) then
 					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_SPELL, rewardSpellIndex);
+				elseif ( genericUnlock ) then
+					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_UNLOCK, rewardSpellIndex);
+				else
+					AddSpellToBucket(spellBuckets, QUEST_SPELL_REWARD_TYPE_AURA, rewardSpellIndex);
 				end
 			end
 		end
@@ -761,12 +776,13 @@ function QuestInfo_ShowRewards()
 			questItem.objectType = "currency";
 			local currencyID;
 			if ( QuestInfoFrame.questLog ) then
-				name, texture, numItems, currencyID = GetQuestLogRewardCurrencyInfo(i);
+				name, texture, numItems, currencyID, quality = GetQuestLogRewardCurrencyInfo(i);
 			else
-				name, texture, numItems = GetQuestCurrencyInfo(questItem.type, i);
+				name, texture, numItems, quality = GetQuestCurrencyInfo(questItem.type, i);
 				currencyID = GetQuestCurrencyID(questItem.type, i);
 			end
 			if (name and texture and numItems) then
+				name, texture, numItems, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, numItems, name, texture, quality); 
 				questItem:SetID(i)
 				questItem:Show();
 				-- For the tooltip
@@ -777,7 +793,7 @@ function QuestInfo_ShowRewards()
 				SetItemButtonTexture(questItem, texture);
 				SetItemButtonTextureVertexColor(questItem, 1.0, 1.0, 1.0);
 				SetItemButtonNameFrameVertexColor(questItem, 1.0, 1.0, 1.0);
-				SetItemButtonQuality(questItem);
+				SetItemButtonQuality(questItem, quality, currencyID);
 
 				if ( buttonIndex > 1 ) then
 					if ( mod(buttonIndex,2) == 1 ) then

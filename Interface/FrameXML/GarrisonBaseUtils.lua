@@ -166,6 +166,58 @@ GarrisonFollowerOptions[LE_FOLLOWER_TYPE_GARRISON_7_0] = {
 	usesOvermaxMechanic = true,
 }
 
+GarrisonFollowerOptions[LE_FOLLOWER_TYPE_GARRISON_8_0] = {
+	abilityTooltipFrame = "GarrisonFollowerAbilityWithoutCountersTooltip",
+	displayCounterAbilityInPlaceOfMechanic = true,
+	followerListCounterNumPerRow = 2,
+	followerListCounterInnerSpacing = 4,
+	followerListCounterOuterSpacingX = 8,
+	followerListCounterOuterSpacingY = 4,
+	followerListCounterScale = 1.15,
+	followerPageShowSourceText = false,
+	followerPageShowGear = false,
+	garrisonType = LE_GARRISON_TYPE_8_0,
+	hideCountersInAbilityFrame = true,
+	hideMissionTypeInLandingPage = true,
+	isPrimaryFollowerType = true,
+	minFollowersForThreatCountersFrame = math.huge,
+	minQualityLevelToShowLevel = LE_ITEM_QUALITY_POOR,
+	missionAbilityTooltipFrame = "GarrisonFollowerMissionAbilityWithoutCountersTooltip",
+	missionCompleteUseNeutralChest = true,
+	missionFrame = "BFAMissionFrame",
+	missionPageAssignFollowerSound = SOUNDKIT.UI_GARRISON_COMMAND_TABLE_SLOT_CHAMPION, 
+	missionPageAssignTroopSound = SOUNDKIT.UI_GARRISON_COMMAND_TABLE_SLOT_TROOP,
+	missionPageMechanicYOffset = -32,
+	missionPageShowXPInMissionInfo = true,
+	missionPageMaxCountersInFollowerFrame = 3,
+	missionPageMaxCountersInFollowerFrameBeforeScaling = 2,
+	missionTooltipShowPartialCountersAsFull = true,
+	partyNotFullText = GARRISON_PARTY_NOT_ENOUGH_CHAMPIONS,
+	showCategoriesInFollowerList = true,
+	showCautionSignOnMissionFollowersSmallBias = false,
+	showILevelInFollowerList = true,
+	showILevelOnFollower = false,
+	showSingleMissionCompleteAnimation = true,
+	showSingleMissionCompleteFollower = false,
+	showSpikyBordersOnSpecializationAbilities = true,
+	strings = {
+		LANDING_COMPLETE = ORDER_HALL_LANDING_COMPLETE,
+		RETURN_TO_START = ORDER_HALL_MISSION_TOOLTIP_RETURN_TO_START,
+		CONFIRM_EQUIPMENT = GARRISON_FOLLOWER_CONFIRM_EQUIPMENT,
+		CONFIRM_EQUIPMENT_REPLACEMENT = GARRISON_FOLLOWER_CONFIRM_EQUIPMENT_REPLACEMENT,
+		TRAITS_LABEL = ORDER_HALL_EQUIPMENT_SLOTS,
+		FOLLOWER_ADDED_TOAST = ORDER_HALL_FOLLOWER_ADDED_TOAST,
+		FOLLOWER_ADDED_UPGRADED_TOAST = ORDER_HALL_FOLLOWER_ADDED_UPGRADED_TOAST,
+		TROOP_ADDED_TOAST = ORDER_HALL_TROOP_ADDED_TOAST,
+		TROOP_ADDED_UPGRADED_TOAST = ORDER_HALL_TROOP_ADDED_UPGRADED_TOAST,
+		FOLLOWER_COUNT_LABEL = FOLLOWERLIST_LABEL_CHAMPIONS,
+		FOLLOWER_COUNT_STRING = GARRISON_CHAMPION_COUNT,
+	},
+	traitAbilitiesAreEquipment = true,
+	useAbilityTooltipStyleWithoutCounters = true,
+	usesOvermaxMechanic = true,
+}
+
 function GetPrimaryGarrisonFollowerType(garrTypeID)
 	for type, options in pairs(GarrisonFollowerOptions) do
 		if (options.garrisonType == garrTypeID and options.isPrimaryFollowerType) then
@@ -198,17 +250,14 @@ function ShowGarrisonLandingPage(garrTypeID)
 	if (GarrisonLandingPage and GarrisonLandingPage:IsShown() and GarrisonLandingPage.garrTypeID == garrTypeID) then
 		return;
 	end
+	if (not GarrisonMissionFrame) then
+		Garrison_LoadUI();
+	end
 	if (garrTypeID == LE_GARRISON_TYPE_6_0) then
-		if (not GarrisonMissionFrame) then
-			Garrison_LoadUI();
-		end
 		GarrisonLandingPage.Report.Title:SetText(GARRISON_LANDING_PAGE_TITLE);
 		GarrisonLandingPage.FollowerList:Initialize(LE_FOLLOWER_TYPE_GARRISON_6_0);
 		GarrisonLandingPage.ShipFollowerList:Initialize(LE_FOLLOWER_TYPE_SHIPYARD_6_2);
 	elseif (garrTypeID == LE_GARRISON_TYPE_7_0) then
-		if (not OrderHallMissionFrame) then
-			OrderHall_LoadUI();
-		end
 		GarrisonLandingPage.Report.Title:SetText(ORDER_HALL_LANDING_PAGE_TITLE);
 		GarrisonLandingPage.FollowerList:Initialize(LE_FOLLOWER_TYPE_GARRISON_7_0);
 	else
